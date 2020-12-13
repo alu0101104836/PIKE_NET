@@ -1,6 +1,6 @@
-#include "socket.hpp"
+#include "../include/socket.hpp"
 
-sockaddr_in make_ip_address(int port, const std::string& ip_address = std::string())
+sockaddr_in make_ip_address(int port, const std::string& ip_address)
 {
     
     sockaddr_in local_address {};
@@ -33,12 +33,6 @@ Socket::Socket(const sockaddr_in& address)
 
     address_ = address;
 }
-
-Socket::~Socket()
-{
-    close(fd_);
-}
-
 
 void Socket::send_to(const Message& mensaje, const sockaddr_in& address)
 {

@@ -11,11 +11,16 @@ int protected_main (void)
 
     while (1)
     {
-        socket.receive_from(mensaje, remote_address);
+        socket_local.receive_from(mensaje, remote_address);
         std::cout << mensaje.text.data();
     }
 
     return 0;
     
 
+}
+
+int main (void)
+{
+    protected_main();
 }

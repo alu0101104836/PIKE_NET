@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 sockaddr_in make_ip_address(int port, const std::string& ip_address = std::string());
 
@@ -18,8 +19,6 @@ struct Message
 {
     std::array<char, 1024> text;
 };
-
-
 
 class Socket
 {
@@ -29,7 +28,7 @@ class Socket
 
     public:
         Socket(const sockaddr_in& address);
-        ~Socket();
+        ~Socket() { close(fd_);}
 
         void send_to(const Message& mensaje, const sockaddr_in& address);
         void receive_from(Message& message, sockaddr_in& address);
