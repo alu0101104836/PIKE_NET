@@ -3,8 +3,8 @@
 int protected_main (void)
 {
     std::cout << "Creadno las ips" << std::endl;
-    sockaddr_in local_address = make_ip_address(3001, "127.0.0.1");
-    sockaddr_in remote_address = make_ip_address(3000, "127.0.0.1");
+    sockaddr_in local_address = make_ip_address(8000, "127.0.0.1");
+    sockaddr_in remote_address = make_ip_address(8001, "127.0.0.1");
 
     std::cout << "Creadno socket local" << std::endl;
     Socket socket_local(local_address);
@@ -12,7 +12,7 @@ int protected_main (void)
     std::cout << "Creadno mensaje" << std::endl;
     Message mensaje;
 
-    int doc = open("Pruebas/prueba.txt", 0);
+    int doc = open("prueba.txt", 0);
     if (doc < 0)
     {
         std::cerr << "Abrir el archivo FAIL" << std::endl;
@@ -22,10 +22,14 @@ int protected_main (void)
     int lectura;
     do
     {
-        std::string buffer;
-        lectura = read(doc, &buffer, buffer.size());
+        char buffer[1024];
+        lectura = read(doc, &buffer, 1024);
+        std::string buffer_(buffer);
 
-        buffer.copy(mensaje.text.data(), mensaje.text.size() - 1, 0);
+        if (lectura == 0)
+            continue;
+
+        buffer_.copy(mensaje.text.data(), mensaje.text.size() - 1, 0);
 
         socket_local.send_to(mensaje, remote_address);
 
