@@ -12,8 +12,8 @@ int protected_main (void)
     std::cout << "Creadno mensaje" << std::endl;
     Message mensaje;
 
-    int doc = open("prueba.txt", 0000);
-    if (doc != 0)
+    int doc = open("Pruebas/prueba.txt", 0);
+    if (doc < 0)
     {
         std::cerr << "Abrir el archivo FAIL" << std::endl;
         return 1;
