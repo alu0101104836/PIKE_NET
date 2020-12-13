@@ -1,26 +1,30 @@
 CC = g++
 CFLAGS  = -g -Wall -std=c++11 -pthread
 
-NetS: NetcpSend.o socket.o
-	$(CC) $(CFLAGS) -o NetS src/NetcpSend.o src/socket.o
-
 NetR: NetcpReceive.o socket.o
-	$(CC) $(CFLAGS) -o NetR src/NetcpReceive.o src/socket.o
+	$(CC) $(CFLAGS) -o NetR NetcpReceive.o socket.o
+
+NetS: NetcpSend.o socket.o
+	$(CC) $(CFLAGS) -o NetS NetcpSend.o socket.o
 
 netcp_pike: main.o socket.o
-	$(CC) $(CFLAGS) -o netcp_pike src/main.o src/socket.o
+	$(CC) $(CFLAGS) -o netcp_pike main.o socket.o
 
-main.o: main.cpp
+
+
+
+main.o: src/main.cpp
 	$(CC) $(CFLAGS) -c src/main.cpp
 
-socket.o: socket.hpp
-	$(CC) $(CFLAGS) -c include/socket.hpp
+socket.o: src/socket.cpp
+	$(CC) $(CFLAGS) -c include/socket.hpp src/socket.cpp
 
-NetcpReceive.o: NetcpReceive.cpp
+NetcpReceive.o: src/NetcpReceive.cpp
 	$(CC) $(CFLAGS) -c src/NetcpReceive.cpp
 
-NetcpReceive.o: NetcpSend.cpp
+NetcpSend.o: src/NetcpSend.cpp
 	$(CC) $(CFLAGS) -c src/NetcpSend.cpp
 
 clean:
 	rm *.o NetR NetS
+
