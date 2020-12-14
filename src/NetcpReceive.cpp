@@ -1,5 +1,7 @@
 #include "../include/socket.hpp"
 
+//Codigo compila y ejecuta pero no recibe el mensaje
+
 int protected_main (void)
 {
     std::cout << "Creadno las ips" << std::endl;
