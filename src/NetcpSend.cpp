@@ -12,7 +12,7 @@ int protected_main (void)
     std::cout << "Creadno mensaje" << std::endl;
     Message mensaje;
 
-    int doc = open("prueba.txt", 0);
+    int doc = open("prueba.txt", 0000);
     if (doc < 0)
     {
         std::cerr << "Abrir el archivo FAIL" << std::endl;
@@ -41,12 +41,34 @@ int protected_main (void)
 int main (void)
 {
     std::cout << "NetCPSend" << std::endl;
-    int result = protected_main();
+    /*int result = protected_main();
     
     if (result > 0)
     {
         std::cerr << "Falló el Send" << std::endl;
         return 1;
     }
-    std::cout << "Exito en el send " << std::endl;
+    else
+        std::cout << "Exito en el send " << std::endl;*/
+
+    try
+    {
+        return protected_main();
+    }
+    catch(const std::bad_alloc& e)
+    {
+        std::cerr << "NetCPSend: " << e.what() << '\n';
+        return 1;
+    }
+    catch(const std::system_error& e)
+    {
+        std::cerr << "NetCPSend: " << e.what() << '\n';
+        return -1;
+    }
+    catch(...)
+    {
+        std::cerr << "NetCPSend ERROR DESCONOCIDO: " << '\n';
+        return -99;
+    }
+    
 }

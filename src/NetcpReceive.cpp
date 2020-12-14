@@ -11,12 +11,12 @@ int protected_main (void)
     Socket socket_local(local_address);
 
     std::cout << "Creadno mensaje" << std::endl;
-    Message mensaje;
+    Message message;
 
     while (1)
     {
-        socket_local.receive_from(mensaje, remote_address);
-        std::cout << mensaje.text.data();
+        socket_local.receive_from(message, remote_address);
+        std::cout << message.text.data();
     }
 
     return 0;
@@ -27,12 +27,23 @@ int protected_main (void)
 int main (void)
 {
     std::cout << "NetCPReceive" << std::endl;
-    int result = protected_main();
-
-    if (result > 0)
+    try
     {
-        std::cerr << "Falló el Send" << std::endl;
+        return protected_main();
+    }
+    catch(const std::bad_alloc& e)
+    {
+        std::cerr << "NetCPReceive: " << e.what() << '\n';
         return 1;
     }
-    std::cout << "Exito en el send " << std::endl;
+    catch(const std::system_error& e)
+    {
+        std::cerr << "NetCPReceive: " << e.what() << '\n';
+        return -1;
+    }
+    catch(...)
+    {
+        std::cerr << "NetCPReceive ERROR DESCONOCIDO: " << '\n';
+        return -99;
+    }
 }
