@@ -1,7 +1,5 @@
 #include "../include/socket.hpp"
 
-// La práctica compila y funciona el send, el mensaje
-
 int protected_main (void)
 {
     std::cout << "Creadno las ips" << std::endl;
@@ -34,6 +32,7 @@ int protected_main (void)
         buffer_.copy(mensaje.text.data(), mensaje.text.size() - 1, 0);
 
         socket_local.send_to(mensaje, remote_address);
+        std::cout << "Enviado: " << buffer_ << std::endl;
 
     } while (lectura != 0);
     

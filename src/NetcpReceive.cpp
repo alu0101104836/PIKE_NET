@@ -1,7 +1,5 @@
 #include "../include/socket.hpp"
 
-//Codigo compila y ejecuta pero no recibe el mensaje
-
 int protected_main (void)
 {
     std::cout << "Creadno las ips" << std::endl;
@@ -18,7 +16,7 @@ int protected_main (void)
     while (1)
     {
         socket_local.receive_from(message, remote_address);
-        std::cout << message.text.data();
+        std::cout << message.text.data() << std::endl;
     }
 
     return 0;

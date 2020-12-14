@@ -37,6 +37,7 @@ Socket::Socket(const sockaddr_in& address)
 void Socket::send_to(const Message& mensaje, const sockaddr_in& address)
 {
     int result = sendto(fd_, &mensaje, sizeof(mensaje), 0, reinterpret_cast<const sockaddr*>(&address), sizeof(address));
+    //std::cout << mensaje.text.data() << std::endl;
     if (result < 0)
         std::cerr << "Falló sendto: " << std::strerror(errno) << std::endl;
 }
@@ -46,7 +47,7 @@ void Socket::receive_from(Message& message, sockaddr_in& address)
     socklen_t src_len = sizeof(address);
     int result = recvfrom(fd_, &message, sizeof(message), 0,
 	reinterpret_cast<sockaddr*>(&address), &src_len);
-
+        //std::cout << message.text.data() << std::endl;
     if (result < 0) 
         std::cerr << "falló recvfrom: " << std::strerror(errno) << std::endl;
 }
