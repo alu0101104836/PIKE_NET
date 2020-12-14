@@ -1,5 +1,7 @@
 #include "../include/socket.hpp"
 
+// La práctica compila y funciona el send, el mensaje
+
 int protected_main (void)
 {
     std::cout << "Creadno las ips" << std::endl;
@@ -41,7 +43,7 @@ int protected_main (void)
 int main (void)
 {
     std::cout << "NetCPSend" << std::endl;
-    /*int result = protected_main();
+    int result = protected_main();
     
     if (result > 0)
     {
@@ -49,9 +51,9 @@ int main (void)
         return 1;
     }
     else
-        std::cout << "Exito en el send " << std::endl;*/
+        std::cout << "Exito en el send " << std::endl;
 
-    try
+    /*try
     {
         return protected_main();
     }
@@ -69,6 +71,6 @@ int main (void)
     {
         std::cerr << "NetCPSend ERROR DESCONOCIDO: " << '\n';
         return -99;
-    }
+    }*/
     
 }
