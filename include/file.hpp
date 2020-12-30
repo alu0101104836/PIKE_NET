@@ -18,8 +18,10 @@ class file_
 {
 private:
     std::string fichero_;
-    int sz_;
+    int sz_ = 1024;
     int var_;
+
+    void* p;
 public:
     file_(const std::string& filename, bool writeonly = true);
     ~file_(){close(var_);}

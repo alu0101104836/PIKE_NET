@@ -25,6 +25,8 @@ int protected_main (void)
     std::string a; 
     a = fichero_send.read_file();
 
+    std::cout << "Contenido: " << a << std::endl;
+
     a.copy(mensaje.text.data(), mensaje.text.size() - 1, 0);
 
     socket_local.send_to(mensaje, remote_address);
@@ -64,7 +66,7 @@ int main (void)
         std::cerr << "NetCPSend ERROR DESCONOCIDO: " << '\n';
         return -99;
     }*/
-    
+    //Fin main
 }
 
 

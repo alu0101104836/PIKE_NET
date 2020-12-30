@@ -10,21 +10,16 @@ int protected_main (void)
 
     Message message;
     
-    Message nombre;
-    socket_local.receive_from(nombre, remote_address);
+    //Message nombre;
+    //socket_local.receive_from(nombre, remote_address);
 
-    std::string nombre_;
-    nombre_ = nombre.text.data();
-    std::cout << "Nombre: " << nombre_ << std::endl;
+    //std::string nombre_;
+    //nombre_ = nombre.text.data();
+    //std::cout << "Nombre: " << nombre_ << std::endl;
 
-    int doc = open("salida.txt", O_RDWR | O_CREAT | O_TRUNC);
-    while (1)
-    {
-        socket_local.receive_from(message, remote_address);
-        std::cout << message.text.data() << std::endl;
-
-    }
-
+    int doc = open("salida.txt", O_WRONLY);
+    socket_local.receive_from(message, remote_address);
+    std::cout << message.text.data() << std::endl;
     write(doc, message.text.data(), message.text.size() - 1);
     close(doc);
 
