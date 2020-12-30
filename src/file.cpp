@@ -4,22 +4,26 @@ file_::file_(const std::string& filename, bool writeonly)
 {
     fichero_ = filename;
 
-    var_ = open(fichero_.c_str(), 0000);
+    var_ = open(fichero_.c_str(), O_RDONLY);
     if (var_ < 0)
     {
         std::cerr << "Abrir el archivo FAIL" << std::endl;
     }
 
-    //sz_ = lseek(var_, 0, SEEK_END);
+    sz_ = lseek(var_, 0, SEEK_END);
+
+    p = mmap(NULL, sz_, PROT_READ, MAP_SHARED, var_, 0);
 
 }
 
 std::string file_::read_file()
 {
-    int lectura;
-    char buffer[sz_];
-    lectura = read(var_, &buffer, sz_);
+    char *buffer;
+
+    buffer = (char *) mmap(NULL, sz_, PROT_READ, MAP_SHARED, var_, 0);
+
     std::string buffer_(buffer);
+
     return buffer_;
 }
 

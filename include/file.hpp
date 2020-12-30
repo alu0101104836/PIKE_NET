@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/mman.h>
 
 class file_
 {
@@ -24,7 +25,11 @@ private:
     void* p;
 public:
     file_(const std::string& filename, bool writeonly = true);
-    ~file_(){close(var_);}
+    ~file_()
+    {
+        close(var_);
+        munmap(p, sz_);
+    }
 
     std::string read_file();
     void write_file(const std::string& data);
