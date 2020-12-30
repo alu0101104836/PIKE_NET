@@ -1,40 +1,33 @@
 #include "../include/socket.hpp"
+#include "../include/file.hpp"
 
 int protected_main (void)
 {
-    std::cout << "Creadno las ips" << std::endl;
     sockaddr_in local_address = make_ip_address(8000, "127.0.0.1");
     sockaddr_in remote_address = make_ip_address(8001, "127.0.0.1");
 
-    std::cout << "Creadno socket local" << std::endl;
     Socket socket_local(local_address);
 
-    std::cout << "Creadno mensaje" << std::endl;
     Message mensaje;
 
-    int doc = open("prueba.txt", 0000);
-    if (doc < 0)
-    {
-        std::cerr << "Abrir el archivo FAIL" << std::endl;
-        return 1;
-    }
+    /*Message nombre;
+    Message size;
 
-    int lectura;
-    do
-    {
-        char buffer[1024];
-        lectura = read(doc, &buffer, 1024);
-        std::string buffer_(buffer);
+    std::string nombre_archivo;
+    std::cout << "Nombre del archivo: ";
+    std::cin >> nombre_archivo;
 
-        if (lectura == 0)
-            continue;
+    nombre_archivo.copy(nombre.text.data(), nombre.text.size() - 1, 0);
+    socket_local.send_to(nombre, remote_address);*/
 
-        buffer_.copy(mensaje.text.data(), mensaje.text.size() - 1, 0);
+    std::string f = "entrada.txt";
+    file_ fichero_send(f);
+    std::string a; 
+    a = fichero_send.read_file();
 
-        socket_local.send_to(mensaje, remote_address);
-        std::cout << "Enviado: " << buffer_ << std::endl;
+    a.copy(mensaje.text.data(), mensaje.text.size() - 1, 0);
 
-    } while (lectura != 0);
+    socket_local.send_to(mensaje, remote_address);
     
     return 0;
 }
@@ -73,3 +66,31 @@ int main (void)
     }*/
     
 }
+
+
+
+
+
+    /*int doc = open("entrada.txt", 0000);
+    if (doc < 0)
+    {
+        std::cerr << "Abrir el archivo FAIL" << std::endl;
+        return 1;
+    }*/
+
+    /*int lectura;
+    do
+    {
+        char buffer[1024];
+        lectura = read(doc, &buffer, 1024);
+        std::string buffer_(buffer);
+
+        if (lectura == 0)
+            continue;
+
+        buffer_.copy(mensaje.text.data(), mensaje.text.size() - 1, 0);
+
+        socket_local.send_to(mensaje, remote_address);
+        std::cout << "Enviado: " << buffer_ << std::endl;
+
+    } while (lectura != 0);*/

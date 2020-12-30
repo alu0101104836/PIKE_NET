@@ -1,23 +1,32 @@
 #include "../include/socket.hpp"
+#include "../include/file.hpp"
 
 int protected_main (void)
 {
-    std::cout << "Creadno las ips" << std::endl;
     sockaddr_in local_address = make_ip_address(8001, "127.0.0.1");
     sockaddr_in remote_address = make_ip_address(8000, "127.0.0.1");
 
-
-    std::cout << "Creadno socket local" << std::endl;
     Socket socket_local(local_address);
 
-    std::cout << "Creadno mensaje" << std::endl;
     Message message;
+    
+    Message nombre;
+    socket_local.receive_from(nombre, remote_address);
 
+    std::string nombre_;
+    nombre_ = nombre.text.data();
+    std::cout << "Nombre: " << nombre_ << std::endl;
+
+    int doc = open("salida.txt", O_RDWR | O_CREAT | O_TRUNC);
     while (1)
     {
         socket_local.receive_from(message, remote_address);
         std::cout << message.text.data() << std::endl;
+
     }
+
+    write(doc, message.text.data(), message.text.size() - 1);
+    close(doc);
 
     return 0;
     

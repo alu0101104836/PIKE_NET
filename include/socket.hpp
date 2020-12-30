@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <pthread.h>
 
 sockaddr_in make_ip_address(int port, const std::string& ip_address = std::string());
 
