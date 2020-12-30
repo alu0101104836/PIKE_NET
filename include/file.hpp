@@ -24,7 +24,7 @@ private:
 
     void* p;
 public:
-    file_(const std::string& filename, bool writeonly = true);
+    file_(const std::string& filename, bool writeonly = false);
     ~file_()
     {
         close(var_);
@@ -33,4 +33,7 @@ public:
 
     std::string read_file();
     void write_file(const std::string& data);
+
+    int getSize() { return sz_;}
+    void setSize(int x) { sz_ = x; }
 };

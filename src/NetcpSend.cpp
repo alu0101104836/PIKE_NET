@@ -9,26 +9,27 @@ int protected_main (void)
     Socket socket_local(local_address);
 
     Message mensaje;
-
-    /*Message nombre;
-    Message size;
+    Message nombre;
+    Message tama;
 
     std::string nombre_archivo;
     std::cout << "Nombre del archivo: ";
     std::cin >> nombre_archivo;
-
     nombre_archivo.copy(nombre.text.data(), nombre.text.size() - 1, 0);
-    socket_local.send_to(nombre, remote_address);*/
+    socket_local.send_to(nombre, remote_address);
 
-    std::string f = "entrada.txt";
-    file_ fichero_send(f);
+    file_ fichero_send(nombre_archivo);
     std::string a; 
     a = fichero_send.read_file();
 
+    int var = fichero_send.getSize();
+    std::string size_of_file = std::to_string(var);
+    size_of_file.copy(tama.text.data(), tama.text.size() - 1, 0);
+    socket_local.send_to(tama, remote_address);
+    std::cout << "Tamaño fichero: " << size_of_file << std::endl;
+
     std::cout << "Contenido: " << a << std::endl;
-
     a.copy(mensaje.text.data(), mensaje.text.size() - 1, 0);
-
     socket_local.send_to(mensaje, remote_address);
     
     return 0;
