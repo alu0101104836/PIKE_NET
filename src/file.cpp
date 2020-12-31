@@ -1,42 +1,76 @@
 #include "../include/file.hpp"
 #include "../include/socket.hpp"
 
-file_::file_(const std::string& filename, bool writeonly)
+file_::file_(const std::string& filename, bool writeonly, size_t sz)
 {
-    fichero_ = filename;
 
     if (writeonly == false)
-        var_ = open(fichero_.c_str(), O_RDONLY);
+    {
+        fd_ = open(filename.c_str(), O_RDONLY);
+        sz_ = lseek(fd_, 0, SEEK_END);
+
+        mem_mapped = mmap(NULL, sz_, PROT_READ, MAP_SHARED, fd_, 0);
+    }
     else
-        var_ = open(fichero_.c_str(), O_RDWR | O_CREAT );
-    
-    if (var_ < 0)
+    {
+        fd_ = open(filename.c_str(), O_RDWR | O_CREAT | O_TRUNC );
+        ftruncate(fd_, sz);
+
+        write(fd_, "", 1);
+
+        void* mem_mapped2 = mmap(NULL, sz_, PROT_READ | PROT_WRITE, MAP_SHARED, fd_, 0);
+    }
+
+
+    if (fd_ < 0)
     {
         std::cerr << "Abrir el archivo FAIL" << std::endl;
     }
+    
+    char *buffer = (char *) mem_mapped;
+    std::cout << "MEM: " << &mem_mapped << std::endl;
+    std::cout << "MEMC: " << buffer << std::endl;
 
+}
+
+
+void* file_::data_()
+{
+    return mem_mapped;
 }
 
 std::string file_::read_file()
 {
-    char *buffer;
-    
-    sz_ = lseek(var_, 0, SEEK_END);
+    int lectura;
+    do
+    {
+        char buffer[1024];
+        lectura = read(fd_, &buffer, 1024);
+        std::string buffer_(buffer);
 
-    buffer = (char *) mmap(NULL, sz_, PROT_READ, MAP_SHARED, var_, 0);
+        return buffer_;
+    } while (lectura != 0);
 
-    std::string buffer_(buffer);
-
-    return buffer_;
+    return "1";
 }
 
 void file_::write_file(const std::string& data)
 {
-    /*Message message;
+    Message message;
     
-    data.copy(message.text.data(), message.text.size() - 1, 0);*/
+    data.copy(message.text.data(), message.text.size() - 1, 0);
 
-    char *buffer;
+    write(fd_, message.text.data(), message.text.size() - 1);
+
+}
+
+    /*char *buffer;
+
+    buffer = (char *) mmap(NULL, sz_, PROT_READ, MAP_SHARED, var_, 0);
+
+    std::string buffer_(buffer);*/
+
+    /*char *buffer;
 
     lseek(var_, data.size(), SEEK_SET);
 
@@ -46,6 +80,4 @@ void file_::write_file(const std::string& data)
 
     memcpy(buffer, &data, data.size());
 
-    msync(buffer, data.size() + 1, MS_SYNC);
-
-}
+    msync(buffer, data.size() + 1, MS_SYNC);*/

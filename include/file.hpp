@@ -18,22 +18,23 @@
 class file_
 {
 private:
-    std::string fichero_;
-    int sz_ = 1024;
-    int var_;
+    size_t sz_;
+    int fd_;
+    void* mem_mapped;
 
-    void* p;
 public:
-    file_(const std::string& filename, bool writeonly = false);
+    file_(const std::string& filename, bool writeonly = false, size_t sz = 0);
     ~file_()
     {
-        close(var_);
-        munmap(p, sz_);
+        close(fd_);
+        munmap(mem_mapped, sz_);
     }
 
     std::string read_file();
     void write_file(const std::string& data);
 
-    int getSize() { return sz_;}
-    void setSize(int x) { sz_ = x; }
+    void* data_();
+
+    size_t getSize() { return sz_; }
+
 };

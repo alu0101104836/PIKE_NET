@@ -8,9 +8,9 @@ int protected_main (void)
 
     Socket socket_local(local_address);
 
-    Message mensaje;
+    //Message mensaje;
     Message nombre;
-    Message tama;
+    Message size;
 
     std::string nombre_archivo;
     std::cout << "Nombre del archivo: ";
@@ -18,20 +18,32 @@ int protected_main (void)
     nombre_archivo.copy(nombre.text.data(), nombre.text.size() - 1, 0);
     socket_local.send_to(nombre, remote_address);
 
-    file_ fichero_send(nombre_archivo);
-    std::string a; 
-    a = fichero_send.read_file();
+    file_ fichero_send("send/" + nombre_archivo, false);
 
-    int var = fichero_send.getSize();
-    std::string size_of_file = std::to_string(var);
-    size_of_file.copy(tama.text.data(), tama.text.size() - 1, 0);
-    socket_local.send_to(tama, remote_address);
-    std::cout << "Tamaño fichero: " << size_of_file << std::endl;
+    int size_f = fichero_send.getSize();
+    std::string buffer = std::to_string(size_f);
 
-    std::cout << "Contenido: " << a << std::endl;
-    a.copy(mensaje.text.data(), mensaje.text.size() - 1, 0);
-    socket_local.send_to(mensaje, remote_address);
+    buffer.copy(size.text.data(), size.text.size() - 1, 0);
+    socket_local.send_to(size, remote_address);
+
+    Message envio;
+    std::cout << "ALV" << std::endl;
+    char* p = (char *) fichero_send.data_();
+    std::string buffer_(p);
+    buffer_.copy(envio.text.data(), envio.text.size() - 1, 0);
+    socket_local.send_to(envio, remote_address);
+    std::cout << "Mensaje: " << buffer_ << std::endl;
+
+
+    /*Message aux;
+    void *p = fichero_send.data_();
+    std::string* buffer = (std::string *) p;
     
+    std::cout << "String: " << *buffer << std::endl;
+    //buffer->copy(aux.text.data(), aux.text.size() - 1, 0);*/
+
+    //socket_local.send_to(aux, remote_address);
+
     return 0;
 }
 

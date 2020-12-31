@@ -7,36 +7,29 @@ int protected_main (void)
     sockaddr_in remote_address = make_ip_address(8000, "127.0.0.1");
 
     Socket socket_local(local_address);
-
-    Message message;
     
     Message nombre;
     socket_local.receive_from(nombre, remote_address);
     std::string nombre_;
     nombre_ = nombre.text.data();
+    nombre_.resize(nombre_.size() - 3);
     std::cout << "Nombre: " << nombre_ << std::endl;
 
-    Message size_of_file_;
-    socket_local.receive_from(size_of_file_, remote_address);
-    std::string size_;
-    size_ = size_of_file_.text.data();
-    int val = std::stoi(size_);
-    std::cout << "Size: " << size_ << std::endl;
+    Message size;
+    socket_local.receive_from(size, remote_address);
+    int size_f;
+    size_f = std::atoi((char*) size.text.data());
+    std::cout << "Tamaño del fichero del send: " << size_f << std::endl;
 
-    std::string nombre_fichero;
-    std::cout << "Nombre del fichero a guardar: ";
-    std::cin >> nombre_fichero;
+    Message mensaje;
+    socket_local.receive_from(mensaje, remote_address);
+    std::string aux = mensaje.text.data();
+    std::cout << "Mensaje: " << aux << std::endl;
 
-    file_ fichero_receive(nombre_fichero,true);
+    file_ fichero_send("rec/" + nombre_, true, size_f);
 
-    socket_local.receive_from(message, remote_address);
-    std::cout << message.text.data() << std::endl;
-    std::string aux = message.text.data();
+    //fichero_send.write_file(aux);
 
-    fichero_receive.setSize(val);
-    fichero_receive.write_file(aux);
-
-    
 
     return 0;
     
