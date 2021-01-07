@@ -5,6 +5,7 @@ CFLAGS  = -g -Wall -std=c++11 -pthread
 #tanto NetR para el receive, como NetS para el Send
 # make NetR 
 # make NetS
+# make NetCP
 
 NetR: NetcpReceive.o socket.o file.o
 	$(CC) $(CFLAGS) -o NetR NetcpReceive.o socket.o file.o
@@ -12,10 +13,8 @@ NetR: NetcpReceive.o socket.o file.o
 NetS: NetcpSend.o socket.o file.o
 	$(CC) $(CFLAGS) -o NetS NetcpSend.o socket.o file.o
 
-NetCP: NetCP.o socket.o
-	$(CC) $(CFLAGS) -o netcp_pike NetCP.o socket.o file.o
-
-
+Net: NetCP.o socket.o file.o
+	$(CC) $(CFLAGS) -o Net NetCP.o socket.o file.o
 
 
 NetCP.o: src/NetCP.cpp
@@ -34,5 +33,5 @@ NetcpSend.o: src/NetcpSend.cpp
 	$(CC) $(CFLAGS) -c src/NetcpSend.cpp
 
 clean:
-	rm *.o NetR NetS
+	rm *.o NetR NetS NetCP
 
