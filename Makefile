@@ -12,14 +12,14 @@ NetR: NetcpReceive.o socket.o file.o
 NetS: NetcpSend.o socket.o file.o
 	$(CC) $(CFLAGS) -o NetS NetcpSend.o socket.o file.o
 
-netcp_pike: main.o socket.o
-	$(CC) $(CFLAGS) -o netcp_pike main.o socket.o file.o
+NetCP: NetCP.o socket.o
+	$(CC) $(CFLAGS) -o netcp_pike NetCP.o socket.o file.o
 
 
 
 
-main.o: src/main.cpp
-	$(CC) $(CFLAGS) -c src/main.cpp
+NetCP.o: src/NetCP.cpp
+	$(CC) $(CFLAGS) -c src/NetCP.cpp
 
 socket.o: src/socket.cpp
 	$(CC) $(CFLAGS) -c include/socket.hpp src/socket.cpp

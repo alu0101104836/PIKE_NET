@@ -3,22 +3,26 @@
 
 file_::file_(const std::string& filename, bool writeonly, size_t sz)
 {
-
     if (writeonly == false)
     {
-        fd_ = open(filename.c_str(), O_RDONLY);
+        fd_ = open(filename.c_str(), O_RDONLY, (mode_t)0600);
+        lockf(fd_, F_LOCK, 0);
         sz_ = lseek(fd_, 0, SEEK_END);
 
         mem_mapped = mmap(NULL, sz_, PROT_READ, MAP_SHARED, fd_, 0);
+        
     }
     else
     {
-        fd_ = open(filename.c_str(), O_RDWR | O_CREAT | O_TRUNC );
+        fd_ = open(filename.c_str(), O_RDWR | O_CREAT | O_TRUNC , (mode_t)0600);
+        lockf(fd_, F_LOCK, 0);
         ftruncate(fd_, sz);
 
         write(fd_, "", 1);
 
-        void* mem_mapped2 = mmap(NULL, sz_, PROT_READ | PROT_WRITE, MAP_SHARED, fd_, 0);
+        char *mem_mapped2 = (char *) mmap(NULL, sz_, PROT_READ | PROT_WRITE, MAP_SHARED, fd_, 0);
+
+        msync(mem_mapped2, sz_, MS_SYNC);
     }
 
 
@@ -28,9 +32,12 @@ file_::file_(const std::string& filename, bool writeonly, size_t sz)
     }
     
     char *buffer = (char *) mem_mapped;
+    //char *buffer2 = (char *) mem_mapped2;
     std::cout << "MEM: " << &mem_mapped << std::endl;
-    std::cout << "MEMC: " << buffer << std::endl;
-
+    if (writeonly == false)
+        std::cout << "MEMC: " << buffer << std::endl;
+   // else
+        //std::cout << "MEMC: " << buffer2 << std::endl;
 }
 
 

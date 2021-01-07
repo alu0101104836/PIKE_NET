@@ -26,8 +26,9 @@ public:
     file_(const std::string& filename, bool writeonly = false, size_t sz = 0);
     ~file_()
     {
-        close(fd_);
         munmap(mem_mapped, sz_);
+        lockf(fd_, F_ULOCK, 0);
+        close(fd_);
     }
 
     std::string read_file();

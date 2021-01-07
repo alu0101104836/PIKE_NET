@@ -26,9 +26,9 @@ int protected_main (void)
     std::string aux = mensaje.text.data();
     std::cout << "Mensaje: " << aux << std::endl;
 
-    file_ fichero_send("rec/" + nombre_, true, size_f);
+    file_ fichero_send("send/" + nombre_, true, size_f);
 
-    //fichero_send.write_file(aux);
+    fichero_send.write_file(aux);
 
 
     return 0;

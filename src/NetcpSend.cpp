@@ -27,7 +27,6 @@ int protected_main (void)
     socket_local.send_to(size, remote_address);
 
     Message envio;
-    std::cout << "ALV" << std::endl;
     char* p = (char *) fichero_send.data_();
     std::string buffer_(p);
     buffer_.copy(envio.text.data(), envio.text.size() - 1, 0);
