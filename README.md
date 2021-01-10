@@ -8,3 +8,5 @@
     ./Net
 #### Ficheros necesarios
     send/file.txt (Solo necesario escribir el fichero)
+    Si se quisiese usar otro fichero junto a otro contenido
+    meter el fichero creado en la carpeta send
