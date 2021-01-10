@@ -2,16 +2,19 @@
 #include "../include/file.hpp"
 #include <cstdlib>
 
+// Variables atomicas para cada opción de retorno
 std::atomic_int quit_app(0);
 std::atomic_int abr(0);
 std::atomic_int abort_receive(0);
 std::atomic_int send_receive(0);
 
+// Función para el manejo de señales
 void manejo(int var)
 {
   quit_app = 1;
 }
 
+// net_send se encarga de enviar el mensaje
 void net_send(std::string &fichero)
 {
   if (quit_app != 1 || abr != 2 || abr != 3 || abr != 4)
@@ -55,6 +58,7 @@ void net_send(std::string &fichero)
   std::cout << "Entrada: ";
 }
 
+// net_receive recibe el mensaje
 void net_receive(std::string &nombre_directorio)
 {
   if (quit_app != 1 || abort_receive != 5)
@@ -97,10 +101,9 @@ void net_receive(std::string &nombre_directorio)
   }
   else
     std::cout << "Caso atomico activado" << std::endl;
-
-  std::cout << "Entrada: ";
 }
 
+// Control de entrada
 void get_entrada(std::string &entrada, std::string &extra)
 {
   std::string var;
