@@ -25,7 +25,7 @@ void net_send(std::string &fichero)
     Message nombre_fichero;
     fichero.copy(nombre_fichero.text.data(), nombre_fichero.text.size() - 1, 0);
     socket_local.send_to(nombre_fichero, remote_address);
-    std::cout << "Nombre del fichero: " << fichero << std::endl;
+    std::cout << "SEND: Nombre del fichero: " << fichero << std::endl;
 
     // Abrimos fichero para lectura
     file_ fichero_send("send/" + fichero, false);
@@ -34,7 +34,7 @@ void net_send(std::string &fichero)
     Message size;
     int size_f = fichero_send.getSize();
     std::string buffer = std::to_string(size_f);
-    std::cout << "Size: " << buffer << std::endl;
+    std::cout << "SEND: Size: " << buffer << std::endl;
 
     buffer.copy(size.text.data(), size.text.size() - 1, 0);
     socket_local.send_to(size, remote_address);
@@ -45,12 +45,14 @@ void net_send(std::string &fichero)
     std::string buffer_(p);
     buffer_.copy(envio.text.data(), envio.text.size() - 1, 0);
     socket_local.send_to(envio, remote_address);
-    std::cout << "Mensaje: " << buffer_ << std::endl;
+    std::cout << "SEND: Mensaje: " << buffer_ << std::endl;
 
     send_receive = 0;
   }
   else
     std::cout << "Caso atomico activado" << std::endl;
+
+  std::cout << "Entrada: ";
 }
 
 void net_receive(std::string &nombre_directorio)
@@ -63,9 +65,9 @@ void net_receive(std::string &nombre_directorio)
     Socket socket_local(local_address);
 
     if (mkdir(nombre_directorio.c_str(), 0777) == -1)
-      std::cerr << std::endl << "Error : " << std::strerror(errno) << std::endl ;
+      std::cerr << std::endl << "RECEIVE: Error : " << std::strerror(errno) << std::endl ;
     else
-      std::cout << "Se ha creado el directorio " << nombre_directorio << std::endl;
+      std::cout << "RECEIVE: Se ha creado el directorio " << nombre_directorio << std::endl;
 
     // Recibimos el nombre del fichero
     Message nombre;
@@ -73,20 +75,20 @@ void net_receive(std::string &nombre_directorio)
     std::string nombre_;
     nombre_ = nombre.text.data();
     nombre_.resize(nombre_.size() - 4);
-    std::cout << "Nombre del fichero: " << nombre_ << std::endl;
+    std::cout << "RECEIVE: Nombre del fichero: " << nombre_ << std::endl;
 
     Message size;
     socket_local.receive_from(size, remote_address);
     int size_f;
     size_f = std::atoi((char *)size.text.data());
-    std::cout << "Size_receive: " << size_f << std::endl;
+    std::cout << "RECEIVE: Size_receive: " << size_f << std::endl;
 
     Message mensaje;
     socket_local.receive_from(mensaje, remote_address);
     std::string aux = mensaje.text.data();
-    std::cout << "Mensaje: " << aux << std::endl;
+    std::cout << "RECEIVE: Mensaje: " << aux << std::endl;
 
-    file_ fichero_send("send/" + nombre_, true, size_f);
+    file_ fichero_send(nombre_directorio + nombre_, true, size_f);
 
     //fichero_send.escribir(aux);
     fichero_send.write_file(aux);
@@ -95,6 +97,8 @@ void net_receive(std::string &nombre_directorio)
   }
   else
     std::cout << "Caso atomico activado" << std::endl;
+
+  std::cout << "Entrada: ";
 }
 
 void get_entrada(std::string &entrada, std::string &extra)
@@ -111,6 +115,8 @@ void get_entrada(std::string &entrada, std::string &extra)
   sigaddset(&set, SIGINT);
   sigaddset(&set, SIGTERM);
   sigaddset(&set, SIGHUP);
+
+  pthread_sigmask(SIG_BLOCK, &set, nullptr);
 
   while (quit_app != 1)
   {
@@ -169,6 +175,15 @@ void get_entrada(std::string &entrada, std::string &extra)
       std::cout << "Quit" << std::endl
                 << std::endl;
       quit_app = 1;
+      try
+      {
+        if( pthread_kill(hilo3.native_handle(), SIGUSR1))
+          std::cout << "Tarea 3 pthread_kill " << std::endl;
+      }
+      catch(...)
+      {
+        throw;
+      }
     }
 
     if (var != "quit")
@@ -176,51 +191,58 @@ void get_entrada(std::string &entrada, std::string &extra)
     else
       entrada = "B";
   }
-
-  
-  std::cout << "Salida: " << entrada << std::endl;
 }
 
 int protected_main(void)
 {
-  std::string salida_funcion = "NULL";
-  std::string opcion;
-
-  struct sigaction act;
-  act.sa_handler = manejo;
-  act.sa_flags = 0;
-  act.sa_sigaction = NULL;
-
-  sigaction(SIGUSR1, &act, NULL);
-  
-  std::thread hilo1;
-
-  while (quit_app != 1)
+  try
   {
-    hilo1 = std::thread (get_entrada, std::ref(salida_funcion), std::ref(opcion));
-    hilo1.join();
-    std::cout << "Fin de hilo 1 & join" << std::endl;
+    std::string salida_funcion = "NULL";
+    std::string opcion;
+  
+    struct sigaction act;
+    act.sa_handler = manejo;
+    act.sa_flags = 0;
+    act.sa_sigaction = NULL;
 
-    if (salida_funcion != "NULL")
-      std::cout << "Ejecución de la linea de comandos: " << salida_funcion << std::endl;
-    else
-      std::cout << "Salida: quit" << std::endl;
+    sigaction(SIGUSR1, &act, NULL);
+  
 
-    if (opcion != "NULL")
-      std::cout << "Con la opción: " << opcion << std::endl;
-
-    if (opcion == "receive")
-      return 3;
-
-    if (send_receive == 2)
+    while (quit_app != 1)
     {
-      std::cout << "Función send" << std::endl;
-    }
+      std::thread hilo1 (get_entrada, std::ref(salida_funcion), std::ref(opcion));
+      hilo1.join();
+      std::cout << "Fin de hilo 1 & join" << std::endl;
 
-    if (send_receive == 1)
-    {
-      std::cout << "Función receive" << std::endl;
+      if (salida_funcion != "NULL")
+        std::cout << "Ejecución de la linea de comandos: " << salida_funcion << std::endl;
+      else
+        std::cout << "Salida: quit" << std::endl;
+
+      if (opcion != "NULL")
+        std::cout << "Con la opción: " << opcion << std::endl;
+
+      if (opcion == "receive")
+        return 3;
+
+      if (send_receive == 2)
+      {
+        std::cout << "Función send" << std::endl;
+      }
+
+      if (send_receive == 1)
+      {
+        std::cout << "Función receive" << std::endl;
+      }
     }
+  }
+  catch(const std::exception& e)
+  {
+    std::cerr << e.what() << '\n';
+  }
+  catch(...)
+  {
+    throw;
   }
 
   return 0;
@@ -249,5 +271,6 @@ int main(void)
     std::cout << "Error desconocido\n";
     return 99;
   }
+
   return 0;
 }
