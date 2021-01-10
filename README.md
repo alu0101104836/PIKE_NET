@@ -6,4 +6,5 @@
     make Net
 #### Ejecución
     ./Net
-#### 
+#### Ficheros necesarios
+    send/file.txt (Solo necesario escribir el fichero)
