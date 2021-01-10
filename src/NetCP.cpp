@@ -6,23 +6,11 @@ std::atomic_int quit_app(0);
 std::atomic_int abr(0);
 std::atomic_int abort_receive(0);
 std::atomic_int send_receive(0);
-/*
-signal(
-  SIGUSR1,
-  &mod_siguser
-);
-struct sigaction act = {
-    .sa_handler = &mi_manejador_de_sigterm, 
-    .sa_sigaction = NULL,   
-    .sa_mask = 0,           
+
+void manejo(int var)
+{
+  quit_app = 1;
 }
-
-sigaction(
-    SIGUSR1, 
-    &act,    
-    NULL     
-);*/
-
 
 void net_send(std::string &fichero)
 {
@@ -117,6 +105,13 @@ void get_entrada(std::string &entrada, std::string &extra)
   std::thread hilo3;
   std::thread hilo2;
 
+  sigset_t set;
+
+  sigemptyset(&set);
+  sigaddset(&set, SIGINT);
+  sigaddset(&set, SIGTERM);
+  sigaddset(&set, SIGHUP);
+
   while (quit_app != 1)
   {
     std::cout << std::endl;
@@ -191,12 +186,15 @@ int protected_main(void)
   std::string salida_funcion = "NULL";
   std::string opcion;
 
-  sigset_t set;
+  struct sigaction act;
+  act.sa_handler = manejo;
+  act.sa_flags = 0;
+  act.sa_sigaction = NULL;
 
-  sigemptyset(&set);
-  sigaddset(&set, SIGINT);
-  sigaddset(&set, SIGUSR1);
+  sigaction(SIGUSR1, &act, NULL);
+  
   std::thread hilo1;
+
   while (quit_app != 1)
   {
     hilo1 = std::thread (get_entrada, std::ref(salida_funcion), std::ref(opcion));
@@ -216,16 +214,12 @@ int protected_main(void)
 
     if (send_receive == 2)
     {
-      //std::thread hilo2(net_send, std::ref(opcion));
       std::cout << "Función send" << std::endl;
-      //hilo2.join();
     }
 
     if (send_receive == 1)
     {
-      //std::thread hilo3(net_receive, std::ref(opcion));
       std::cout << "Función receive" << std::endl;
-      //hilo3.join();
     }
   }
 
