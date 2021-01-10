@@ -12,7 +12,7 @@ int protected_main (void)
     socket_local.receive_from(nombre, remote_address);
     std::string nombre_;
     nombre_ = nombre.text.data();
-    nombre_.resize(nombre_.size() - 3);
+    nombre_.resize(nombre_.size() - 6);
     std::cout << "Nombre: " << nombre_ << std::endl;
 
     Message size;
@@ -28,7 +28,7 @@ int protected_main (void)
 
     file_ fichero_send("send/" + nombre_, true, size_f);
 
-    fichero_send.write_file(aux);
+    //fichero_send.write_file(aux);
 
 
     return 0;

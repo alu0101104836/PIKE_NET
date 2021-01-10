@@ -33,5 +33,5 @@ NetcpSend.o: src/NetcpSend.cpp
 	$(CC) $(CFLAGS) -c src/NetcpSend.cpp
 
 clean:
-	rm *.o NetR NetS NetCP
+	rm *.o NetR NetS Net
 

@@ -14,6 +14,10 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/mman.h>
+#include <thread>
+#include <exception>
+#include <atomic>
+#include <signal.h>
 
 class file_
 {
@@ -33,7 +37,7 @@ public:
 
     std::string read_file();
     void write_file(const std::string& data);
-
+    void escribir(std::string mensaje);
     void* data_();
 
     size_t getSize() { return sz_; }

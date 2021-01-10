@@ -46,6 +46,9 @@ void Socket::receive_from(Message& message, sockaddr_in& address)
     socklen_t src_len = sizeof(address);
     int result = recvfrom(fd_, &message, sizeof(message) + 1, 0,
 	reinterpret_cast<sockaddr*>(&address), &src_len);
-    if (result < 0) 
+    
+    if (result < 0 && result != EINTR) 
         std::cerr << "falló recvfrom: " << std::strerror(errno) << std::endl;
+    else if (result == EINTR)
+        std::cout << "Función terminó sin recibir mensaje" << std::endl;
 }

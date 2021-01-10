@@ -6,6 +6,9 @@ file_::file_(const std::string& filename, bool writeonly, size_t sz)
     if (writeonly == false)
     {
         fd_ = open(filename.c_str(), O_RDONLY, (mode_t)0600);
+        if (fd_ < 0)
+            std::cerr << "Abrir el archivo FAIL" << std::endl;
+        
         lockf(fd_, F_LOCK, 0);
         sz_ = lseek(fd_, 0, SEEK_END);
 
@@ -15,29 +18,24 @@ file_::file_(const std::string& filename, bool writeonly, size_t sz)
     else
     {
         fd_ = open(filename.c_str(), O_RDWR | O_CREAT | O_TRUNC , (mode_t)0600);
+        if (fd_ < 0)
+            std::cerr << "Abrir el archivo FAIL" << std::endl;        
+        
         lockf(fd_, F_LOCK, 0);
+        
         ftruncate(fd_, sz);
-
+        sz_ = sz;
+        
         write(fd_, "", 1);
 
-        char *mem_mapped2 = (char *) mmap(NULL, sz_, PROT_READ | PROT_WRITE, MAP_SHARED, fd_, 0);
-
-        msync(mem_mapped2, sz_, MS_SYNC);
-    }
-
-
-    if (fd_ < 0)
-    {
-        std::cerr << "Abrir el archivo FAIL" << std::endl;
+        mem_mapped = mmap(0, sz, PROT_READ | PROT_WRITE, MAP_SHARED, fd_, 0);
     }
     
-    char *buffer = (char *) mem_mapped;
-    //char *buffer2 = (char *) mem_mapped2;
+    /*char * buffer;
+    buffer = (char *) mem_mapped;
     std::cout << "MEM: " << &mem_mapped << std::endl;
     if (writeonly == false)
-        std::cout << "MEMC: " << buffer << std::endl;
-   // else
-        //std::cout << "MEMC: " << buffer2 << std::endl;
+        std::cout << "MEMC: " << buffer << std::endl;*/
 }
 
 
@@ -69,6 +67,13 @@ void file_::write_file(const std::string& data)
 
     write(fd_, message.text.data(), message.text.size() - 1);
 
+}
+
+void file_::escribir(std::string mensaje)
+{
+    mem_mapped = reinterpret_cast<void*> (&mensaje);
+
+    msync(mem_mapped, sz_, MS_SYNC);
 }
 
     /*char *buffer;
