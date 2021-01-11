@@ -112,6 +112,7 @@ void get_entrada(std::string &entrada, std::string &extra)
   std::thread hilo3;
   std::thread hilo2;
 
+  //Set de señales
   sigset_t set;
 
   sigemptyset(&set);
@@ -203,6 +204,7 @@ int protected_main(void)
     std::string salida_funcion = "NULL";
     std::string opcion;
   
+    //Manejo de las señales 
     struct sigaction act;
     act.sa_handler = manejo;
     act.sa_flags = 0;
