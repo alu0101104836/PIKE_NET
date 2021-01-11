@@ -92,7 +92,7 @@ void net_receive(std::string &nombre_directorio)
     std::string aux = mensaje.text.data();
     std::cout << "RECEIVE: Mensaje: " << aux << std::endl;
 
-    file_ fichero_send(nombre_directorio + nombre_, true, size_f);
+    file_ fichero_send(nombre_directorio+ "/" + nombre_, true, size_f);
 
     //fichero_send.escribir(aux);
     fichero_send.write_file(aux);
