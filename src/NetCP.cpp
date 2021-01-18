@@ -2,10 +2,20 @@
 #include "../include/file.hpp"
 #include <cstdlib>
 
+
+/*
+  export NETCP_DEST_IP=127.0.0.1
+  export NETCP_DEST_PORT=8001
+  export NETCP_PORT=8000
+*/
+
+//std::mutex mutex;
+
 std::atomic_int quit_app(0);
 std::atomic_int abr(0);
 std::atomic_int abort_receive(0);
 std::atomic_int send_receive(0);
+
 
 void manejo(int var)
 {
@@ -57,7 +67,7 @@ void net_send(std::string &fichero)
 
 void net_receive(std::string &nombre_directorio)
 {
-  if (quit_app != 1 || abort_receive != 5)
+  while (quit_app != 1 || abort_receive != 5)
   {
     sockaddr_in local_address = make_ip_address(8001, "127.0.0.1");
     sockaddr_in remote_address = make_ip_address(8000, "127.0.0.1");
@@ -95,8 +105,8 @@ void net_receive(std::string &nombre_directorio)
 
     send_receive = 0;
   }
-  else
-    std::cout << "Caso atomico activado" << std::endl;
+  //else
+    //std::cout << "Caso atomico activado" << std::endl;
 
   std::cout << "Entrada: ";
 }
@@ -248,11 +258,41 @@ int protected_main(void)
   return 0;
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+  char *D1, *D2, *D3;
+  
+  D1 = getenv("NETCP_DEST_IP");
+  D2 = getenv("NETCP_DEST_PORT");
+  D3 = getenv("NETCP_PORT");
+
+  if (D1 == NULL)
+  {
+    std::cout << "Variable de entorno NETCP_DEST_IP vacía" << std::endl;
+    D1 =(char *) "127.0.0.1";
+    std::cout << "Ahora es " << D1 << std::endl;
+  }
+  
+  if (D2 == NULL)
+  {
+    std::cout << "Variable de entorno NETCP_DEST_POR vacía" << std::endl;
+    D2 =(char *) "8001";
+    std::cout << "Ahora es " << D2 << std::endl;
+  }
+  
+  if (D3 == NULL)
+  {
+    std::cout << "Variable de entorno NETCP_PORT vacía " << std::endl;
+    D3 = (char *) "8000";
+    std::cout << "Ahora es " << D3 << std::endl;
+  }
+  
+
+  std::cout << "SALIDA: " << D1 << " " << D2 << " " << D3 << std::endl;
+
   try
   {
-    return protected_main();
+    //return protected_main();
   }
   catch (std::bad_alloc &e)
   {
@@ -271,6 +311,9 @@ int main(void)
     std::cout << "Error desconocido\n";
     return 99;
   }
+
+
+
 
   return 0;
 }
