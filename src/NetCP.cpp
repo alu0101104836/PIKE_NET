@@ -1,6 +1,8 @@
 #include "../include/socket.hpp"
 #include "../include/file.hpp"
 #include <cstdlib>
+#include <vector>
+#include <functional>
 
 
 /*
@@ -11,10 +13,21 @@
 
 //std::mutex mutex;
 
+struct Data_table
+{
+  std::vector<int> entradas_;
+};
+
 std::atomic_int quit_app(0);
 std::atomic_int abr(0);
 std::atomic_int abort_receive(0);
 std::atomic_int send_receive(0);
+
+std::atomic_int fin_send(0);
+
+#define NETCP_DEST_IP_STANDARD "127.0.0.1"
+#define NETCP_DEST_PORT_STANDARD 8001
+#define NETCP_DEST_STANDARD 8000
 
 
 void manejo(int var)
@@ -25,10 +38,11 @@ void manejo(int var)
 void net_send(std::string &fichero)
 {
   if (quit_app != 1 || abr != 2 || abr != 3 || abr != 4)
-  {
-    sockaddr_in local_address = make_ip_address(8000, "127.0.0.1");
-    sockaddr_in remote_address = make_ip_address(8001, "127.0.0.1");
-
+  { 
+    
+    sockaddr_in local_address = make_ip_address(NETCP_DEST_STANDARD, NETCP_DEST_IP_STANDARD);
+    sockaddr_in remote_address = make_ip_address(NETCP_DEST_PORT_STANDARD, NETCP_DEST_IP_STANDARD);
+    
     Socket socket_local(local_address);
 
     //Pasamos nombre del fichero a el receive
@@ -62,15 +76,16 @@ void net_send(std::string &fichero)
   else
     std::cout << "Caso atomico activado" << std::endl;
 
-  std::cout << "Entrada: ";
+  fin_send = 1;
+  //std::cout << "Entrada: ";
 }
 
 void net_receive(std::string &nombre_directorio)
 {
   while (quit_app != 1 || abort_receive != 5)
   {
-    sockaddr_in local_address = make_ip_address(8001, "127.0.0.1");
-    sockaddr_in remote_address = make_ip_address(8000, "127.0.0.1");
+    sockaddr_in local_address = make_ip_address(NETCP_DEST_PORT_STANDARD, NETCP_DEST_IP_STANDARD);
+    sockaddr_in remote_address = make_ip_address(NETCP_DEST_STANDARD, NETCP_DEST_IP_STANDARD);
 
     Socket socket_local(local_address);
 
@@ -117,7 +132,12 @@ void get_entrada(std::string &entrada, std::string &extra)
   extra = "NULL";
   entrada = "A";
   std::thread hilo3;
-  std::thread hilo2;
+
+  std::vector<std::thread > thread_pool;
+  int contador_hilos = 1;
+
+  thread_pool.reserve(128);
+  Data_table id;
 
   sigset_t set;
 
@@ -134,6 +154,11 @@ void get_entrada(std::string &entrada, std::string &extra)
     std::cout << "Entrada: ";
     std::cin >> var;
     std::cout << std::endl;
+
+    if(fin_send == 1)
+    {
+      id.entradas_[contador_hilos] = 0;
+    }
 
     if (var == "receive")
     {
@@ -152,8 +177,12 @@ void get_entrada(std::string &entrada, std::string &extra)
       std::cout << "Nombre del archivo a enviar: ";
       std::cin >> extra;
 
-      hilo2 = std::thread (net_send, std::ref(extra));
-      //hilo2.join();
+      std::cout << "Pool de hilos" << std::endl;
+      thread_pool.push_back(std::thread(std::bind(net_send, std::ref(extra))));
+      
+      id.entradas_[contador_hilos] = contador_hilos;
+
+      contador_hilos++;
       send_receive = 2;
     }
     else if (var == "abort")
@@ -209,7 +238,26 @@ int protected_main(void)
   {
     std::string salida_funcion = "NULL";
     std::string opcion;
-  
+
+    char * DEST_IP = getenv("NETCP_DEST_IP");
+    char * DEST_PORT = getenv("NETCP_DEST_PORT");
+    char * PORT = getenv("NETCP_PORT");
+
+    if ( (DEST_IP == NULL) | (DEST_PORT == NULL) | (PORT == NULL) )
+    {
+      std::cout << "Variable de entorno vacía" << std::endl;
+      std::cout << "Ejecute los siguientes comandos: " << std::endl;
+      std::cout << "export NETCP_DEST_IP=127.0.0.1" << std::endl;
+      std::cout << "export NETCP_DEST_PORT=8001" << std::endl;
+      std::cout << "export NETCP_PORT=8000" << std::endl;
+      std::cout << std::endl;
+      std::cout << "Se aplicará los estándares" << std::endl;
+    }
+    else
+      std::cout << "Variables de entorno: " << DEST_IP << " " << DEST_PORT << " " << PORT << std::endl;
+
+
+
     struct sigaction act;
     act.sa_handler = manejo;
     act.sa_flags = 0;
@@ -217,7 +265,6 @@ int protected_main(void)
 
     sigaction(SIGUSR1, &act, NULL);
   
-
     while (quit_app != 1)
     {
       std::thread hilo1 (get_entrada, std::ref(salida_funcion), std::ref(opcion));
@@ -260,11 +307,38 @@ int protected_main(void)
 
 int main(int argc, char *argv[])
 {
-  char *D1, *D2, *D3;
+
+  try
+  {
+    return protected_main();
+  }
+  catch (std::bad_alloc &e)
+  {
+    std::cerr << "mytalk"
+              << ": memoria insuficiente\n";
+    return 1;
+  }
+  catch (std::system_error &e)
+  {
+    std::cerr << "mytalk"
+              << ": " << e.what() << '\n';
+    return 2;
+  }
+  catch (...)
+  {
+    std::cout << "Error desconocido\n";
+    return 99;
+  }
+
+  return 0;
+}
+
+
+  /*char *D1, *D2, *D3;
   
-  D1 = getenv("NETCP_DEST_IP");
-  D2 = getenv("NETCP_DEST_PORT");
-  D3 = getenv("NETCP_PORT");
+  DEST_IP = getenv("NETCP_DEST_IP");
+  DEST_PORT = (int) getenv("NETCP_DEST_PORT");
+  PORT = (int) getenv("NETCP_PORT");
 
   if (D1 == NULL)
   {
@@ -288,32 +362,4 @@ int main(int argc, char *argv[])
   }
   
 
-  std::cout << "SALIDA: " << D1 << " " << D2 << " " << D3 << std::endl;
-
-  try
-  {
-    //return protected_main();
-  }
-  catch (std::bad_alloc &e)
-  {
-    std::cerr << "mytalk"
-              << ": memoria insuficiente\n";
-    return 1;
-  }
-  catch (std::system_error &e)
-  {
-    std::cerr << "mytalk"
-              << ": " << e.what() << '\n';
-    return 2;
-  }
-  catch (...)
-  {
-    std::cout << "Error desconocido\n";
-    return 99;
-  }
-
-
-
-
-  return 0;
-}
+  std::cout << "SALIDA: " << D1 << " " << D2 << " " << D3 << std::endl;*/
